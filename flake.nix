@@ -41,8 +41,8 @@
           '';
 
           installPhase = ''
-            mkdir -p $out/bin
-            cp genreport $out/bin
+            mkdir -p $out
+            cp genreport $out
           '';
 
           meta = with lib; {
