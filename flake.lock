@@ -1,0 +1,60 @@
+{
+  "nodes": {
+    "dns-compliance-testing-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1591667559,
+        "narHash": "sha256-QeOgJnH56dS6Ne++tomuiQ/FmKjLHA0Jis9ekRel/g8=",
+        "rev": "42c384ee05b1c0be51a260f369f5f4ec74a24cd5",
+        "revCount": 174,
+        "type": "git",
+        "url": "https://gitlab.isc.org/isc-projects/DNS-Compliance-Testing.git"
+      },
+      "original": {
+        "rev": "42c384ee05b1c0be51a260f369f5f4ec74a24cd5",
+        "type": "git",
+        "url": "https://gitlab.isc.org/isc-projects/DNS-Compliance-Testing.git"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1649012074,
+        "narHash": "sha256-vQUROcJ3FfT3GTB/nJrXwVvjuq8WfK0ImN+RUgDVN1c=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "bc4b9eef3ce3d5a90d8693e8367c9cbfc9fc1e13",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "dns-compliance-testing-src": "dns-compliance-testing-src",
+        "nixpkgs": "nixpkgs",
+        "utils": "utils"
+      }
+    },
+    "utils": {
+      "locked": {
+        "lastModified": 1648297722,
+        "narHash": "sha256-W+qlPsiZd8F3XkzXOzAoR+mpFqzm3ekQkJNa+PIh1BQ=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "0f8662f1319ad6abf89b3380dd2722369fc51ade",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}
