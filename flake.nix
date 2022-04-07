@@ -13,7 +13,7 @@
 
   outputs = { self, nixpkgs, dns-compliance-testing-src, utils }:
     let
-      systems = [ "x86_64-linux" "i686-linux" "aarch64-linux" "aarch64-darwin" ];
+      systems = [ "x86_64-linux" "i686-linux" "aarch64-linux" "aarch64-darwin" "x86-64-darwin" ];
       forAllSystems = f: nixpkgs.lib.genAttrs systems (system: f system);
       nixpkgsFor = forAllSystems (system:
         import nixpkgs {
@@ -41,15 +41,14 @@
           '';
 
           installPhase = ''
-            mkdir -p $out
-            cp genreport $out
+            mkdir -p $out/bin
+            cp genreport $out/bin/dns-compliance-testing
           '';
 
           meta = with lib; {
             description = "DNS protocol compliance of the servers they are delegating zones to.";
             homepage = https://gitlab.isc.org/isc-projects/DNS-Compliance-Testing;
             license = licenses.mpl20;
-            platforms = platforms.linux;
             maintainers = with maintainers; [ case ];
           };
         });
@@ -63,7 +62,6 @@
 
       devShell = forAllSystems (system:
         with nixpkgsFor.${system}; pkgs.mkShell {
-          src = dns-compliance-testing-src;
           buildInputs = with pkgs; [
             pkg-config
             autoconf
@@ -75,6 +73,9 @@
             autogen
             glibc
           ];
+          shellHook = ''
+            ln -s "${dns-compliance-testing-src}" ./src
+          '';
         });
     };
 }
