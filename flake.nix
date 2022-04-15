@@ -2,7 +2,7 @@
   description = "dns-compliance-testing";
 
   inputs = {
-    nixpkgs.url = github:NixOS/nixpkgs/nixos-unstable;
+    nixpkgs.url = github:NixOS/nixpkgs/nixos-21.11;
     dns-compliance-testing-src = {
       url = "git+https://gitlab.isc.org/isc-projects/DNS-Compliance-Testing.git?rev=42c384ee05b1c0be51a260f369f5f4ec74a24cd5";
       flake = false;
@@ -11,32 +11,25 @@
   };
 
 
-  outputs = { self, nixpkgs, dns-compliance-testing-src, utils }:
-    let
-      systems = [ "x86_64-linux" "i686-linux" "aarch64-linux" "aarch64-darwin" "x86-64-darwin" ];
-      forAllSystems = f: nixpkgs.lib.genAttrs systems (system: f system);
-      nixpkgsFor = forAllSystems (system:
-        import nixpkgs {
+  outputs = { self, nixpkgs, dns-compliance-testing-src, utils }: utils.lib.eachDefaultSystem
+    (system:
+      let
+        pkgs = import nixpkgs {
           inherit system;
           overlays = [ self.overlay ];
-        }
-      );
-    in
-    {
-      overlay = final: prev: {
-        dns-compliance-testing = with final; (stdenv.mkDerivation {
+        };
+        dns-compliance-testing = with pkgs; (stdenv.mkDerivation {
           name = "dns-compliance-testing";
           src = dns-compliance-testing-src;
-          nativeBuildInputs = [ autoreconfHook pkg-config autoconf automake ];
-          buildInputs = [ pkgconfig autoconf openssl.dev gcc gnumake automake libtool autogen ];
+          nativeBuildInputs = [ autogen autoreconfHook pkg-config autoconf automake gcc pkgconfig libtool ];
+          buildInputs = [ openssl.dev ];
 
           configurePhase = ''
             autoreconf -fi
-            ./configure
+            OPENSSL_LIBS=$(pkg-config --libs openssl) ./configure
           '';
 
           buildPhase = ''
-            OPENSSL_LIBS=$(pkg-config --libs openssl) ./configure
             make
           '';
 
@@ -52,16 +45,12 @@
             maintainers = with maintainers; [ case ];
           };
         });
-      };
-
-      packages = forAllSystems (system: {
-        inherit (nixpkgsFor.${system}) dns-compliance-testing;
-      });
-
-      defaultPackage = forAllSystems (system: self.packages.${system}.dns-compliance-testing);
-
-      devShell = forAllSystems (system:
-        with nixpkgsFor.${system}; pkgs.mkShell {
+      in
+      rec
+      {
+        packages.${system} = dns-compliance-testing;
+        defaultPackage = dns-compliance-testing;
+        devShell = pkgs.mkShell {
           buildInputs = with pkgs; [
             pkg-config
             autoconf
@@ -71,11 +60,40 @@
             automake
             libtool
             autogen
-            glibc
           ];
           shellHook = ''
             ln -s "${dns-compliance-testing-src}" ./src
           '';
-        });
+        };
+      }) // {
+    overlay = final: prev: {
+      dns-compliance-testing = with final; (stdenv.mkDerivation {
+        name = "dns-compliance-testing";
+        src = dns-compliance-testing-src;
+        nativeBuildInputs = [ autogen autoreconfHook pkg-config autoconf automake gcc pkgconfig libtool ];
+        buildInputs = [ openssl.dev ];
+
+        configurePhase = ''
+          autoreconf -fi
+          OPENSSL_LIBS=$(pkg-config --libs openssl) ./configure
+        '';
+
+        buildPhase = ''
+          make
+        '';
+
+        installPhase = ''
+          mkdir -p $out/bin
+          cp genreport $out/bin/dns-compliance-testing
+        '';
+
+        meta = with lib; {
+          description = "DNS protocol compliance of the servers they are delegating zones to.";
+          homepage = https://gitlab.isc.org/isc-projects/DNS-Compliance-Testing;
+          license = licenses.mpl20;
+          maintainers = with maintainers; [ case ];
+        };
+      });
     };
+  };
 }
