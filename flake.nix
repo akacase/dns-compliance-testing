@@ -18,8 +18,8 @@
           inherit system;
           overlays = [ self.overlay ];
         };
-        dns-compliance-testing = with pkgs; (stdenv.mkDerivation {
-          name = "dns-compliance-testing";
+        genreport = with pkgs; (stdenv.mkDerivation {
+          name = "genreport";
           src = dns-compliance-testing-src;
           nativeBuildInputs = [ autogen autoreconfHook pkg-config autoconf automake gcc pkgconfig libtool ];
           buildInputs = [ openssl.dev ];
@@ -35,7 +35,7 @@
 
           installPhase = ''
             mkdir -p $out/bin
-            cp genreport $out/bin/dns-compliance-testing
+            cp genreport $out/bin/genreport
           '';
 
           meta = with lib; {
@@ -48,8 +48,8 @@
       in
       rec
       {
-        packages.${system} = dns-compliance-testing;
-        defaultPackage = dns-compliance-testing;
+        packages.${system} = genreport;
+        defaultPackage = genreport;
         devShell = pkgs.mkShell {
           buildInputs = with pkgs; [
             pkg-config
@@ -67,8 +67,8 @@
         };
       }) // {
     overlay = final: prev: {
-      dns-compliance-testing = with final; (stdenv.mkDerivation {
-        name = "dns-compliance-testing";
+      genreport = with final; (stdenv.mkDerivation {
+        name = "genreport";
         src = dns-compliance-testing-src;
         nativeBuildInputs = [ autogen autoreconfHook pkg-config autoconf automake gcc pkgconfig libtool ];
         buildInputs = [ openssl.dev ];
@@ -84,7 +84,7 @@
 
         installPhase = ''
           mkdir -p $out/bin
-          cp genreport $out/bin/dns-compliance-testing
+          cp genreport $out/bin/genreport
         '';
 
         meta = with lib; {
