@@ -2,7 +2,7 @@
   description = "dns-compliance-testing";
 
   inputs = {
-    nixpkgs.url = github:NixOS/nixpkgs/nixos-21.11;
+    nixpkgs.url = github:NixOS/nixpkgs/nixos-22.05;
     dns-compliance-testing-src = {
       url = "git+https://gitlab.isc.org/isc-projects/DNS-Compliance-Testing.git?rev=42c384ee05b1c0be51a260f369f5f4ec74a24cd5";
       flake = false;
@@ -18,7 +18,14 @@
           inherit system;
           overlays = [ self.overlay ];
         };
-        genreport = with pkgs; (stdenv.mkDerivation {
+        gcc_musl = with nixpkgs; pkgs.wrapCCWith {
+        cc = pkgs.gcc.cc;
+          bintools = pkgs.wrapBintoolsWith {
+            bintools = pkgs.binutils-unwrapped;
+            libc = pkgs.musl;
+          };
+        };
+        genreport = with pkgs; (overrideCC stdenv gcc_musl).mkDerivation {
           name = "genreport";
           src = dns-compliance-testing-src;
           nativeBuildInputs = [ autogen autoreconfHook pkg-config autoconf automake gcc pkgconfig libtool ];
@@ -44,7 +51,7 @@
             license = licenses.mpl20;
             maintainers = with maintainers; [ case ];
           };
-        });
+        };
       in
       rec
       {
