@@ -18,14 +18,7 @@
           inherit system;
           overlays = [ self.overlay ];
         };
-        gcc_musl = with nixpkgs; pkgs.wrapCCWith {
-        cc = pkgs.gcc.cc;
-          bintools = pkgs.wrapBintoolsWith {
-            bintools = pkgs.binutils-unwrapped;
-            libc = pkgs.musl;
-          };
-        };
-        genreport = with pkgs; (overrideCC stdenv gcc_musl).mkDerivation {
+        genreport = with pkgs; stdenv.mkDerivation {
           name = "genreport";
           src = dns-compliance-testing-src;
           nativeBuildInputs = [ autogen autoreconfHook pkg-config autoconf automake gcc pkgconfig libtool ];
