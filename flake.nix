@@ -22,11 +22,11 @@
           name = "genreport";
           src = dns-compliance-testing-src;
           nativeBuildInputs = [ autogen autoreconfHook pkg-config autoconf automake gcc pkgconfig libtool ];
-          buildInputs = [ openssl.dev ];
+          buildInputs = [ openssl.dev ldns ];
 
           configurePhase = ''
             autoreconf -fi
-            OPENSSL_LIBS=$(pkg-config --libs openssl) ./configure
+            OPENSSL_LIBS=$(pkg-config --libs openssl ldns) ./configure
           '';
 
           buildPhase = ''
