@@ -2,9 +2,9 @@
   description = "dns-compliance-testing";
 
   inputs = {
-    nixpkgs.url = github:NixOS/nixpkgs/nixos-22.05;
+    nixpkgs.url = github:NixOS/nixpkgs/nixos-23.05;
     dns-compliance-testing-src = {
-      url = "git+https://gitlab.isc.org/isc-projects/DNS-Compliance-Testing.git?rev=42c384ee05b1c0be51a260f369f5f4ec74a24cd5";
+      url = "git+https://gitlab.isc.org/isc-projects/DNS-Compliance-Testing.git?rev=4aea40ba0310de10560ba6deaa2d2e6eebbe8f48";
       flake = false;
     };
     utils.url = "github:numtide/flake-utils";
@@ -22,11 +22,10 @@
           name = "genreport";
           src = dns-compliance-testing-src;
           nativeBuildInputs = [ autogen autoreconfHook pkg-config autoconf automake gcc pkgconfig libtool ];
-          buildInputs = [ openssl.dev ldns ];
-
+          buildInputs = [ openssl.dev ];
           configurePhase = ''
-            autoreconf -fi
-            OPENSSL_LIBS=$(pkg-config --libs openssl ldns) ./configure
+            autoreconf -fvi 
+            LDFLAGS="-lresolv" OPENSSL_LIBS=$(pkg-config --libs openssl) ./configure
           '';
 
           buildPhase = ''
@@ -52,9 +51,11 @@
         defaultPackage = genreport;
         devShell = pkgs.mkShell {
           buildInputs = with pkgs; [
+            nixpkgs-fmt
             pkg-config
             autoconf
             openssl
+            ldns
             gcc
             gnumake
             automake
@@ -74,8 +75,8 @@
         buildInputs = [ openssl.dev ];
 
         configurePhase = ''
-          autoreconf -fi
-          OPENSSL_LIBS=$(pkg-config --libs openssl) ./configure
+          autoreconf -fvi 
+          LDFLAGS="-lresolv" OPENSSL_LIBS=$(pkg-config --libs openssl) ./configure
         '';
 
         buildPhase = ''
