@@ -2,7 +2,7 @@
   description = "dns-compliance-testing";
 
   inputs = {
-    nixpkgs.url = github:NixOS/nixpkgs/nixos-23.05;
+    nixpkgs.url = github:NixOS/nixpkgs/nixos-23.11;
     dns-compliance-testing-src = {
       url = "git+https://gitlab.isc.org/isc-projects/DNS-Compliance-Testing.git?rev=4aea40ba0310de10560ba6deaa2d2e6eebbe8f48";
       flake = false;
@@ -21,7 +21,7 @@
         genreport = with pkgs; stdenv.mkDerivation {
           name = "genreport";
           src = dns-compliance-testing-src;
-          nativeBuildInputs = [ autogen autoreconfHook pkg-config autoconf automake gcc pkgconfig libtool ];
+          nativeBuildInputs = [ autogen autoreconfHook pkg-config autoconf automake gcc pkg-config libtool ];
           buildInputs = [ openssl.dev ];
           configurePhase = ''
             autoreconf -fvi 
